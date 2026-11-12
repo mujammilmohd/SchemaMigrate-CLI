@@ -77,7 +77,7 @@ python main.py
 
 ## Learning Outcomes
 
-Through this project, we aim to improve our understanding of Python, file handling, JSON operations, command-line interfaces, error handling, and software development using Git and GitHub.
+Through this project, we aim to improve our understanding of Python, file handling, JSON operations, command-line interfaces, error handling, and software development Git and GitHub.
 
 ---
 
