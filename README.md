@@ -65,7 +65,7 @@ python main.py
 
 ## Team Members
 | Mujammil | Developer |
-| Nikita   | Developer |
+| Nikita   | Developer
 
 ## Project Information
 
