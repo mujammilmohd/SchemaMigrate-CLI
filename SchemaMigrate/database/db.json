@@ -1,0 +1,30 @@
+{
+    "schema_version": "002",
+    "students": [
+        {
+            "id": 1,
+            "name": "Aarav",
+            "email": ""
+        },
+        {
+            "id": 2,
+            "name": "Meera",
+            "email": ""
+        }
+    ],
+    "migration_history": [
+        {
+            "version": "001",
+            "filename": "001_create_courses.json",
+            "applied_at": "2026-11-17T10:50:58+05:30",
+            "status": "APPLIED"
+        },
+        {
+            "version": "002",
+            "filename": "002_add_email_field.json",
+            "applied_at": "2026-11-17T10:50:58+05:30",
+            "status": "APPLIED"
+        }
+    ],
+    "courses": []
+}

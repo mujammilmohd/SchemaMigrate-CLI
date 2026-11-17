@@ -1,0 +1,16 @@
+{
+    "version": "001",
+    "name": "Create Courses",
+    "operations": [
+        {
+            "type": "create_collection",
+            "collection": "courses"
+        }
+    ],
+    "rollback": [
+        {
+            "type": "drop_collection",
+            "collection": "courses"
+        }
+    ]
+}
