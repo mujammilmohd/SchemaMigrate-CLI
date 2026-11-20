@@ -1,0 +1,19 @@
+{
+    "version": "002",
+    "name": "Add Email Field",
+    "operations": [
+        {
+            "type": "add_field",
+            "collection": "students",
+            "field": "email",
+            "default": ""
+        }
+    ],
+    "rollback": [
+        {
+            "type": "remove_field",
+            "collection": "students",
+            "field": "email"
+        }
+    ]
+}

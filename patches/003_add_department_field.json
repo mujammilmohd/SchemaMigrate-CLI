@@ -1,0 +1,19 @@
+{
+    "version": "003",
+    "name": "Add Department Field",
+    "operations": [
+        {
+            "type": "add_field",
+            "collection": "students",
+            "field": "department",
+            "default": "\u672a\u6307\u5b9a"
+        }
+    ],
+    "rollback": [
+        {
+            "type": "remove_field",
+            "collection": "students",
+            "field": "department"
+        }
+    ]
+}

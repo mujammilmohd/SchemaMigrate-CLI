@@ -1,0 +1,14 @@
+{
+    "schema_version": null,
+    "students": [
+        {
+            "id": 1,
+            "name": "Aarav"
+        },
+        {
+            "id": 2,
+            "name": "Meera"
+        }
+    ],
+    "migration_history": []
+}
