@@ -1,0 +1,19 @@
+{
+    "version": "002",
+    "name": "Add student status",
+    "operations": [
+        {
+            "type": "add_field",
+            "collection": "students",
+            "field": "status",
+            "default": "active"
+        }
+    ],
+    "rollback": [
+        {
+            "type": "remove_field",
+            "collection": "students",
+            "field": "status"
+        }
+    ]
+}
