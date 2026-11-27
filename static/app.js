@@ -102,17 +102,80 @@ async function refreshDashboard() {
 async function loadPatches() {
   try {
     const patches = await api("/api/patches");
-    $("patchTable").innerHTML = patches.length ? patches.map(patch => `
-      <tr data-search="${escapeHtml(`${patch.name} ${patch.filename} ${patch.version}`.toLowerCase())}">
-        <td>${escapeHtml(patch.version)}</td>
-        <td><b>${escapeHtml(patch.name)}</b><br><span class="mono">${escapeHtml(patch.filename)}</span></td>
-        <td>${patch.operations.length} operation(s)</td>
-        <td><span class="status-pill ${patch.status === "PENDING" ? "pending" : ""}">${patch.status}</span></td>
-      </tr>`).join("") : '<tr><td colspan="4" class="empty-cell">No patches found.</td></tr>';
+
+    $("patchTable").innerHTML = patches.length
+      ? patches.map(patch => `
+        <tr data-search="${escapeHtml(
+          `${patch.name} ${patch.filename} ${patch.version}`.toLowerCase()
+        )}">
+          <td>${escapeHtml(patch.version)}</td>
+
+          <td>
+            <b>${escapeHtml(patch.name)}</b><br>
+            <span class="mono">${escapeHtml(patch.filename)}</span>
+          </td>
+
+          <td>${patch.operations.length} operation(s)</td>
+
+          <td>
+            <span class="status-pill ${patch.status === "PENDING" ? "pending" : ""}">
+              ${patch.status}
+            </span>
+          </td>
+
+          <td>
+            ${
+              patch.status === "PENDING"
+                ? `<button class="button button-danger-soft delete-patch-btn"
+                     data-version="${escapeHtml(patch.version)}">
+                     Delete
+                   </button>`
+                : `<span class="mono">Locked</span>`
+            }
+          </td>
+        </tr>
+      `).join("")
+      : '<tr><td colspan="5" class="empty-cell">No patches found.</td></tr>';
+
   } catch (error) {
-    $("patchTable").innerHTML = `<tr><td colspan="4" class="empty-cell">${escapeHtml(error.message)}</td></tr>`;
+    $("patchTable").innerHTML =
+      `<tr><td colspan="5" class="empty-cell">${escapeHtml(error.message)}</td></tr>`;
   }
 }
+
+
+
+$("patchTable").addEventListener("click", event => {
+  const button = event.target.closest(".delete-patch-btn");
+
+  if (!button) return;
+
+  const version = button.dataset.version;
+
+  if (role() !== "administrator") {
+    toast("Administrator access is required to delete migrations.", true);
+    return;
+  }
+
+  askConfirmation(
+    "Delete migration patch?",
+    `Are you sure you want to permanently delete migration ${version}? This cannot be undone.`,
+    "Delete patch",
+    async () => {
+      const result = await api(`/api/patches/${version}`, {
+        method: "DELETE",
+        body: JSON.stringify({ role: role() })
+      });
+
+      toast(result.message);
+
+      await refreshDashboard();
+      await loadPatches();
+    }
+  );
+});
+
+
 
 async function loadHistory() {
   try {
