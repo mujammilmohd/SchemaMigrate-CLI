@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10151d">
+  <title>SchemaMigrate — Database Migration Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">S</span><span>Schema<span class="brand-light">Migrate</span><small>DATABASE CONTROL</small></span></a>
+    <div class="side-label">WORKSPACE</div>
+    <nav>
+      <button class="nav-item active" data-page="overview"><span>▦</span> Overview</button>
+      <button class="nav-item" data-page="migrations"><span>⇄</span> Migrations <b id="navPending" class="nav-count">0</b></button>
+      <button class="nav-item" data-page="history"><span>◷</span> History</button>
+      <button class="nav-item" data-page="database"><span>▤</span> Database</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="help-card"><div class="help-icon">✦</div><b>New to SchemaMigrate?</b><p>Learn how to safely manage schema changes.</p><button id="reopenTutorial" class="text-button">Open quick tutorial →</button></div>
+      <div class="sidebar-foot"><span class="live-dot"></span> Local workspace <span class="version-tag">v1.0</span></div>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div><div class="eyebrow">WORKSPACE / <span id="crumb">OVERVIEW</span></div><h1 id="pageTitle">Overview</h1></div>
+      <div class="top-actions">
+        <label class="role-control"><span>ACCESS ROLE</span><select id="roleSelect"><option value="operator">Operator</option><option value="administrator">Administrator</option></select></label>
+        <button class="button button-quiet" id="refreshBtn">↻ <span>Refresh</span></button>
+        <button class="button button-primary" id="applyTop">Apply migrations <span>→</span></button>
+      </div>
+    </header>
+
+    <section class="page active" id="overview">
+      <div class="welcome-row"><div><div class="eyebrow accent">DATABASE OVERVIEW</div><h2>Your schema, <em>under control.</em></h2><p class="subheading">Track changes, preview migrations and keep your JSON database consistent.</p></div><div class="version-chip"><span class="live-dot"></span><span>Current version</span><b id="currentVersion">Loading…</b></div></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-top"><span>Applied migrations</span><span class="stat-icon green">✓</span></div><strong id="appliedCount">—</strong><small>Successfully completed</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Pending migrations</span><span class="stat-icon amber">◷</span></div><strong id="pendingCount">—</strong><small>Waiting for deployment</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Total migrations</span><span class="stat-icon blue">⇄</span></div><strong id="totalCount">—</strong><small>Available patch files</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Collections</span><span class="stat-icon violet">▤</span></div><strong id="collectionCount">—</strong><small>JSON collections detected</small></article>
+      </div>
+      <div class="content-grid">
+        <article class="panel pipeline-panel"><div class="panel-heading"><div><h3>Migration pipeline</h3><p>Review the order of your schema changes.</p></div><button class="text-button" data-goto="migrations">View all →</button></div><div id="pipeline" class="pipeline"><div class="loading">Loading migrations…</div></div></article>
+        <article class="panel health-panel"><div class="panel-heading"><div><h3>Workspace status</h3><p>Current database readiness.</p></div></div><div id="healthIcon" class="health-icon">✓</div><h4 id="healthTitle">Checking database…</h4><p id="healthText">Please wait while we load your migration status.</p><div class="health-divider"></div><button class="button button-outline full" id="dryRunBtn">Preview pending changes</button></article>
+      </div>
+      <article class="panel recent-panel"><div class="panel-heading"><div><h3>Recent activity</h3><p>Your latest database changes.</p></div><button class="text-button" data-goto="history">View history →</button></div><div id="recentActivity" class="recent-list"><div class="loading">Loading activity…</div></div></article>
+    </section>
+
+    <section class="page" id="migrations">
+      <div class="section-intro"><div><div class="eyebrow accent">CHANGE MANAGEMENT</div><h2>Migration library</h2><p class="subheading">Review patch files before applying them to your database.</p></div><button class="button button-primary" id="newPatchBtn">＋ Create migration</button></div>
+      <div class="toolbar"><div class="search-box">⌕ <input id="patchSearch" placeholder="Search migrations…" /></div><div class="legend"><span><i class="legend-dot green-bg"></i> Applied</span><span><i class="legend-dot amber-bg"></i> Pending</span></div></div>
+      <article class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>VERSION</th><th>MIGRATION</th><th>OPERATIONS</th><th>STATUS</th></tr></thead><tbody id="patchTable"><tr><td colspan="4" class="empty-cell">Loading migrations…</td></tr></tbody></table></div></article>
+      <div class="action-strip"><div><b>Ready to update your schema?</b><p>Run a dry-run first to validate all pending operations without changing data.</p></div><div class="action-buttons"><button class="button button-outline" id="dryRunPage">Run dry-run</button><button class="button button-primary" id="applyBtn">Apply pending →</button></div></div>
+    </section>
+
+    <section class="page" id="history">
+      <div class="section-intro"><div><div class="eyebrow accent">AUDIT TRAIL</div><h2>Migration history</h2><p class="subheading">A chronological record of applied schema changes.</p></div><button class="button button-danger-soft" id="rollbackBtn">↶ Roll back latest</button></div>
+      <article class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>VERSION</th><th>MIGRATION FILE</th><th>APPLIED AT</th><th>STATUS</th></tr></thead><tbody id="historyTable"><tr><td colspan="4" class="empty-cell">Loading history…</td></tr></tbody></table></div></article>
+      <p class="note">Rollback uses the rollback operations defined in the latest migration's patch file. Keep backups of important data.</p>
+    </section>
+
+    <section class="page" id="database">
+      <div class="section-intro"><div><div class="eyebrow accent">DATA INSPECTOR</div><h2>Database explorer</h2><p class="subheading">Inspect the JSON database currently used by this dashboard.</p></div><button class="button button-outline" id="copyDb">Copy JSON</button></div>
+      <div id="collectionCards" class="collection-grid"></div>
+      <article class="panel json-panel"><div class="panel-heading"><div><h3>Raw database JSON</h3><p>Read-only preview of database/db.json.</p></div><span class="file-pill">database / db.json</span></div><pre id="databaseJson">Loading database…</pre></article>
+    </section>
+
+    <footer class="main-footer"><span>SchemaMigrate <b>·</b> Local JSON migration manager</span><span>Changes are stored in your project folder.</span></footer>
+  </main>
+</div>
+
+<div id="toast" class="toast" role="status"></div>
+
+<div class="modal-backdrop" id="tutorialModal">
+  <div class="modal tutorial-modal">
+    <div class="modal-top"><span class="modal-kicker">WELCOME TO SCHEMAMIGRATE</span><button class="icon-button" id="closeTutorial" aria-label="Close">×</button></div>
+    <div class="tutorial-progress"><span id="tutorialProgress"></span></div>
+    <div class="tutorial-content">
+      <div class="tutorial-symbol" id="tutorialSymbol">✦</div>
+      <div class="eyebrow accent" id="tutorialStep">GETTING STARTED · 01</div>
+      <h2 id="tutorialTitle">Welcome to your migration workspace.</h2>
+      <p id="tutorialBody">This dashboard helps you change your JSON database in a controlled, trackable way. Let's take a quick tour.</p>
+      <div class="tutorial-tip" id="tutorialTip">A migration is a small, versioned set of instructions that changes your database structure.</div>
+    </div>
+    <div class="modal-footer"><button class="text-button" id="skipTutorial">Skip tutorial</button><div><span id="tutorialCounter">1 of 4</span><button class="button button-primary" id="nextTutorial">Next step →</button></div></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal confirm-modal"><div class="modal-top"><span class="modal-kicker">PLEASE CONFIRM</span><button class="icon-button" id="closeConfirm">×</button></div><div class="tutorial-symbol warning-symbol">!</div><h2 id="confirmTitle">Confirm action</h2><p id="confirmBody">Are you sure?</p><div class="modal-footer"><button class="button button-outline" id="cancelConfirm">Cancel</button><button class="button button-primary" id="confirmAction">Confirm</button></div></div>
+</div>
+
+<div class="modal-backdrop" id="patchModal">
+  <div class="modal patch-modal"><div class="modal-top"><span class="modal-kicker">MIGRATION BUILDER</span><button class="icon-button" id="closePatch">×</button></div><h2>Create a migration</h2><p class="modal-description">Add a new versioned patch. Use valid JSON for forward and rollback operations.</p>
+    <label class="field-label">VERSION <input id="patchVersion" placeholder="004" /></label>
+    <label class="field-label">MIGRATION NAME <input id="patchName" placeholder="Add student phone" /></label>
+    <div class="field-grid"><label class="field-label">FORWARD OPERATIONS <textarea id="forwardOps" rows="6">[
+  {"type":"add_field","collection":"students","field":"phone","default":""}
+]</textarea></label><label class="field-label">ROLLBACK OPERATIONS <textarea id="rollbackOps" rows="6">[
+  {"type":"remove_field","collection":"students","field":"phone"}
+]</textarea></label></div>
+    <div class="form-hint">Supported types: create_collection, drop_collection, add_field, remove_field.</div>
+    <div class="modal-footer"><button class="button button-outline" id="cancelPatch">Cancel</button><button class="button button-primary" id="savePatch">Save migration</button></div>
+  </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
