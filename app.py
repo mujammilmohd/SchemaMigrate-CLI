@@ -331,6 +331,48 @@ def api_create_patch():
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 
+@app.delete("/api/patches/<version>")
+def api_delete_patch(version):
+    payload = request.get_json(silent=True) or {}
+
+    denied = require_admin(payload)
+    if denied:
+        return denied
+
+    try:
+        # Validate version format
+        if not re.fullmatch(r"\d{3,}", version):
+            return jsonify({"error": "Invalid migration version."}), 400
+
+        db = read_db()
+        patches = get_patches()
+
+        # Find the requested patch
+        patch = next(
+            (p for p in patches if p["version"] == version),
+            None
+        )
+
+        if patch is None:
+            return jsonify({"error": "Migration patch not found."}), 404
+
+        # Never delete an applied migration
+        if version in applied_versions(db):
+            return jsonify({
+                "error": "Applied migrations cannot be deleted. Roll back first."
+            }), 409
+
+        # Delete the patch file
+        patch_path = PATCH_DIR / patch["filename"]
+        patch_path.unlink()
+
+        return jsonify({
+            "message": f'Migration {version} deleted successfully.'
+        })
+
+    except Exception as exc:
+        app.logger.exception("Deleting migration failed")
+        return jsonify({"error": str(exc)}), 400
 
 @app.errorhandler(404)
 def not_found(_error):
