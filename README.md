@@ -1,4 +1,5 @@
-# SchemaMigrate — Clean Dashboard
+# SchemaMigrate
+
 
 A beginner-friendly Flask website for managing JSON database schema migrations.
 
